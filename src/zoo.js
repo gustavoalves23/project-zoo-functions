@@ -48,7 +48,7 @@ function countAnimals(species) {
   const animalsList = {};
   data.species.forEach((specie) => {
     animalsList[specie.name] = specie.residents.length;
-    return 'ok';
+    return undefined;
   });
   if (species === undefined) {
     return animalsList;
