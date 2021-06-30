@@ -86,8 +86,40 @@ function increasePrices(percentage) {
   // seu código aqui
 }
 
+const convertAnimalIdIntoName = (id) => data.species.find((specie) => id === specie.id).name;
+
+const checkInputType = (input) => {
+  const allEmployees = {
+    id: data.employees.map((employee) => employee.id),
+    firstName: data.employees.map((employee) => employee.firstName),
+    lastName: data.employees.map((employee) => employee.lastName),
+  };
+  const typeList = Object.values(allEmployees).find((personInfo) => personInfo.includes(input));
+  const inputType = Object.keys(allEmployees).find((key) => allEmployees[key] === typeList);
+  const personFn = data.employees.find((employee) => employee[inputType] === input).firstName;
+  const personLn = data.employees.find((employee) => employee[inputType] === input).lastName;
+  const personAnimalsIds = data.employees.find((emp) => emp[inputType] === input).responsibleFor;
+  const personAnimals = personAnimalsIds.map((id) => convertAnimalIdIntoName(id));
+  return {
+    firstName: personFn,
+    lastName: personLn,
+    responsibleFor: personAnimals,
+  };
+};
+
 function getEmployeeCoverage(idOrName) {
-  // seu código aqui
+  const list = {};
+  const person = checkInputType(idOrName);
+  if (typeof (idOrName) === 'undefined') {
+    data.employees.forEach((employee) => {
+      const fn = employee.firstName;
+      const ln = employee.lastName;
+      list[`${fn} ${ln}`] = employee.responsibleFor.map((id) => convertAnimalIdIntoName(id));
+    });
+  } else {
+    list[`${person.firstName} ${person.lastName}`] = person.responsibleFor;
+  }
+  return list;
 }
 
 module.exports = {
