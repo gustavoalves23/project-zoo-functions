@@ -1,9 +1,6 @@
 const data = require('./data');
 
 function getSpeciesByIds(...ids) {
-  if (ids.length === 0) {
-    return [];
-  }
   return data.species.filter((specie) => ids.includes(specie.id));
 }
 
@@ -21,11 +18,7 @@ function getEmployeeByName(employeeName) {
 }
 
 function createEmployee(personalInfo, associatedWith) {
-  return { id: personalInfo.id,
-    firstName: personalInfo.firstName,
-    lastName: personalInfo.lastName,
-    managers: associatedWith.managers,
-    responsibleFor: associatedWith.responsibleFor,
+  return { ...personalInfo, ...associatedWith,
   };
 }
 
@@ -33,13 +26,13 @@ function isManager(id) {
   return data.employees.some((employee) => employee.managers.includes(id));
 }
 
-function addEmployee(id, firstName, lastName, managers, responsibleFor) {
+function addEmployee(id, firstName, lastName, managers = [], responsibleFor = []) {
   const employee = {
     id,
     firstName,
     lastName,
-    managers: managers === undefined ? [] : managers,
-    responsibleFor: responsibleFor === undefined ? [] : responsibleFor,
+    managers,
+    responsibleFor,
   };
   data.employees.push(employee);
 }
@@ -57,7 +50,7 @@ function countAnimals(species) {
 }
 
 function calculateEntry(entrants) {
-  const costs = data.prices;
+  const { prices: costs } = data;
   if (typeof (entrants) === 'undefined') {
     return 0;
   }
@@ -83,7 +76,9 @@ function getOldestFromFirstSpecies(id) {
 }
 
 function increasePrices(percentage) {
-  // seu código aqui
+  const { prices: pr } = data;
+  const rnd = (number) => Math.round(number * (1 + percentage / 100) * 100) / 100;
+  data.prices = Object.keys(pr).reduce((acc, age) => { acc[age] = rnd(pr[age]); return acc; }, {});
 }
 
 const convertAnimalIdIntoName = (id) => data.species.find((specie) => id === specie.id).name;
