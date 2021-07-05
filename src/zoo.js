@@ -63,8 +63,102 @@ function calculateEntry(entrants) {
   }
 }
 
+const getResidents = (specie) => {
+  const { species } = data;
+  return species.find((sp2) => sp2.name === specie).residents.map((res) => res.name);
+};
+
+const getResidentsWithSex = (specie, sex) => {
+  const { species } = data;
+  const speciesFind = species.find((sp2) => sp2.name === specie);
+  return speciesFind.residents.filter((rs) => rs.sex === sex).map((rs) => rs.name);
+};
+
+const includeNamesTrue = () => {
+  const regions = ['NE', 'NW', 'SE', 'SW'];
+  const ans = regions.reduce((acc, act) => {
+    acc[act] = data.species.filter((specie) => specie.location === act).map((specie) => {
+      const { name } = specie;
+      const ans2 = {};
+      ans2[name] = getResidents(name);
+      return ans2;
+    });
+    return acc;
+  }, {});
+  return ans;
+};
+
+const sort = () => {
+  const regions = ['NE', 'NW', 'SE', 'SW'];
+  const ans = regions.reduce((acc, act) => {
+    acc[act] = data.species.filter((specie) => specie.location === act).map((specie) => {
+      const { name } = specie;
+      const ans2 = {};
+      ans2[name] = getResidents(name).sort();
+      return ans2;
+    });
+    return acc;
+  }, {});
+  return ans;
+};
+
+const sexFilter = (sex) => {
+  const regions = ['NE', 'NW', 'SE', 'SW'];
+  const ans = regions.reduce((acc, act) => {
+    acc[act] = data.species.filter((specie) => specie.location === act).map((specie) => {
+      const { name } = specie;
+      const ans2 = {};
+      ans2[name] = getResidentsWithSex(name, sex);
+      return ans2;
+    });
+    return acc;
+  }, {});
+  return ans;
+};
+
+const sexFilterPlusSort = (sex) => {
+  const regions = ['NE', 'NW', 'SE', 'SW'];
+  const ans = regions.reduce((acc, act) => {
+    acc[act] = data.species.filter((specie) => specie.location === act).map((specie) => {
+      const { name } = specie;
+      const ans2 = {};
+      ans2[name] = getResidentsWithSex(name, sex).sort();
+      return ans2;
+    });
+    return acc;
+  }, {});
+  return ans;
+};
+
+const filtersChoose = (options) => {
+  let ans = includeNamesTrue();
+  const { sorted = false, sex = undefined } = options;
+  if (sorted) {
+    ans = sort();
+  }
+  if (sex !== undefined) {
+    ans = sexFilter(sex);
+  }
+  if (sex !== undefined && sorted) {
+    ans = sexFilterPlusSort(sex);
+  }
+  return ans;
+};
+
 function getAnimalMap(options) {
-  // seu código aqui
+  const { species } = data;
+  const regions = ['NE', 'NW', 'SE', 'SW'];
+  const ans = regions.reduce((acc, act) => {
+    acc[act] = species.filter((specie) => specie.location === act).map((specie) => specie.name);
+    return acc;
+  }, {});
+  if (typeof (options) === 'object') {
+    const { includeNames = false } = options;
+    if (includeNames) {
+      return filtersChoose(options);
+    }
+  }
+  return ans;
 }
 
 function getSchedule(dayName) {
